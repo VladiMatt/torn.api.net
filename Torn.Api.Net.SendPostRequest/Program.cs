@@ -10,7 +10,7 @@ namespace Torn.Api.Net.SendPostRequest
 {
     internal class Program
     {
-        
+        /*
         static async Task Main()
         {
             //create and send a sample request
@@ -22,7 +22,7 @@ namespace Torn.Api.Net.SendPostRequest
             };
             
             await SendAPIRequest(request);
-        }
+        }*/
         
 
         public static async Task SendAPIRequest(TornAPI_Request request)
@@ -32,15 +32,15 @@ namespace Torn.Api.Net.SendPostRequest
                 Console.WriteLine("Constructing request...");
                 client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/json"));
 
+                //this convoluted mess helps to keep the query clean of any unused fields... I have absolutely zero idea if that's important though lmao
                 var _id =  request.userId != null ? request.userId : "";
-                var _selections = $"&selections="; {for (int i = 0; i < request.selections.Length; i++){_selections = _selections + request.selections[i] + (i == request.selections.Length-1 ? "" : ",");}}
+                var _selections = $"&selections={String.Join (',', request.selections)}";
                 var _key = $"&key={request.apiKey}";
                 var _comment =  request.comment != null ? $"&comment={request.comment}" : "";
 
                 //Format: https://api.torn.com/:SECTION/:ID?selections=:SELECTIONS&key=:KEY
                 string url = "https://api.torn.com/";
                 string _query = @$"{_id}?{_selections}{_key}{_comment}";
-                
                 client.BaseAddress = new Uri ($@"{url}{request.section}/");
 
                 Console.WriteLine("Sending request: " + url + _query);
@@ -53,7 +53,6 @@ namespace Torn.Api.Net.SendPostRequest
                 } else {
                     Console.WriteLine("ERROR: " + response.StatusCode);
                 }
-                
             }
         }
     }
